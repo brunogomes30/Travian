@@ -1,12 +1,19 @@
 from selenium import webdriver
 server = "https://ts2.lusobrasileiro.travian.com/"
+from Village import *
+
+resources_tupple = ("madeira","barro","ferro","cereais")
 
 def make_adventure(driver):
-    driver.get(server + "hero.php?t=3")
-    adventures = driver.find_elements_by_css_selector(".gotoAdventure")
-    if len(adventures) >0:
-        adventures[0].click()
-        driver.find_element_by_css_selector(".adventureSendButton > div >  .startAdventure").click()
+    try:
+        driver.get(server + "hero.php?t=3")
+        adventures = driver.find_elements_by_css_selector(".gotoAdventure")
+        if len(adventures) >0:
+            adventures[0].click()
+            driver.find_element_by_css_selector(".adventureSendButton > div >  .startAdventure").click()
+        return True
+    except Exception:
+        return False
 
 
 def set_hero_resources(resource,driver):
@@ -24,6 +31,31 @@ def set_hero_resources(resource,driver):
 
 
 #Falta guardar o tempo para quando pode evoluir
+def level_best_resource(village):
+    driver = village.driver
+    driver.get(server + "dorf1.php")    
+    prod_res = order_resources(village)
+    
+    for i in range(len(prod_res)):
+        t = prod_res[i]
+        if(level_resource(resources_tupple[t[0]],0,driver)):
+            if(i<3):
+                level_resource(resources_tupple[prod_res[i+1][0]],0,driver)
+            break
+
+#Returns a list with [index,production,stock]
+def order_resources(village):
+    productions = village.productions
+    resources = village.resources
+    prod_res = list([i,productions[i],resources[i]] for i in range(4))
+    
+    prod_res = sorted(prod_res, key=lambda x:(x[1]+ x[2]/8))
+    for x in prod_res:
+        print((x[1]+ x[2]/8),end=" ")
+    print()
+    print(prod_res)
+    return prod_res
+
 def level_resource(name,highOrLow,driver):
     ids = {
             "madeira" : 1,
@@ -31,7 +63,7 @@ def level_resource(name,highOrLow,driver):
             "barro"   : 2,
             "ferro"   : 3
             }
-    if(name !="ferro" and name !="madeira" and name !="barro" and name !="madeira"):
+    if(name !="ferro" and name !="madeira" and name !="barro" and name !="cereais"):
         print(name +"não é um recurso")
         return
     resource_id = ids[name]
@@ -40,12 +72,16 @@ def level_resource(name,highOrLow,driver):
     for r in resources:
         classes = r.get_attribute("class")
         #get index of last 'level'
-        print(classes)
+        #print(classes)
         index = classes.find("level",2)
-        print(classes)
+        #print(classes)
         level = int(classes[index+5:])
+        
+        if("underConstruction" in classes):
+            level +=1
+            
         levels.append((r,level))
-    print(levels)
+    #print(levels)
     
     #Sorting...
     if highOrLow ==0:
@@ -53,28 +89,36 @@ def level_resource(name,highOrLow,driver):
     else:
         levels = sorted(levels, key=lambda x:(x[1]), reverse=True)
         
-    print(levels)
+    #print(levels)
     count = 1
     href = ""
     arr = driver.find_elements_by_css_selector("#village_map > *")
     for r in arr:
-        print(r)
+        #print(r)
         if( r == levels[0][0]):
             href = "/build.php?id="+str(count)
             break
         count+=1
-    print("href="+href)
+    #print("href="+href)
     driver.get(server + href)
     error_message_list = driver.find_elements_by_css_selector("div.upgradeBlocked > .errorMessage")
+    gold_builder_list = driver.find_elements_by_css_selector(".section1 > .gold.builder")
+    print("GOLD",len(gold_builder_list))
+    if(len(gold_builder_list)>0):
+        return False
     if(len(error_message_list) == 0):
-        level_up_building()
+        level_up_building(driver)
+        return True
     else:
         text = error_message_list[0].text
-        day = text[24:26]
-        month = text[27:29]
-        hour = text[34:36]
-        minute = text[37:39]
+        
+        day = int(text[24:26])
+        month = int(text[27:29])
+        hour = int(text[34:36])
+        minute = int(text[37:39])
+        
         print(day,month,hour,minute)
+        return False
 
 def level_up_wall(driver):
     driver.get(server + "/build.php?id=40")
@@ -82,7 +126,10 @@ def level_up_wall(driver):
     
     
 def level_up_building(driver):
-    driver.find_element_by_css_selector("button.green.build").click()
+    try:
+        driver.find_element_by_css_selector("button.green.build").click()
+    except Exception:
+        print("Erro a level_up_building")
     
     
     
