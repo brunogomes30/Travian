@@ -1,12 +1,16 @@
+server = "https://ts2.lusobrasileiro.travian.com/"
 from selenium import webdriver
 from threading import Timer
 from Village import Village
 import random
 import functions
+import os
+
+#reload(Village)
 
 username = "ultracg"
 password = "12345"
-server = "https://ts2.lusobrasileiro.travian.com/"
+
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--headless")
@@ -21,7 +25,7 @@ def teste(arg):
 village = Village()
 def init():
     global village
-    driver = webdriver.Chrome("C:\\Users\\ultra\\OneDrive\\Desktop\\chromedriver.exe") #,chrome_options=chrome_options
+    driver = webdriver.Chrome(os.getcwd()+"\\webdriver\\chromedriver.exe") #,chrome_options=chrome_options
     driver.get("https://ts2.lusobrasileiro.travian.com/")
     #login
     driver.find_element_by_name("name").send_keys(username)
@@ -35,7 +39,7 @@ def init():
 
 def loop():
     global driver,village
-    driver = webdriver.Chrome("C:\\Users\\ultra\\OneDrive\\Desktop\\chromedriver.exe",chrome_options=chrome_options) 
+    driver = webdriver.Chrome("webdriver\\chromedriver.exe") #,chrome_options=chrome_options 
     driver.get("https://ts2.lusobrasileiro.travian.com/")
     driver.find_element_by_name("name").send_keys(username)
     driver.find_element_by_name("password").send_keys(password)
@@ -43,7 +47,7 @@ def loop():
     village.driver = driver
     village.refresh_data()
     print(village)
-    functions.make_adventure(driver)
+    #functions.make_adventure(driver)
     functions.level_best_resource(village)
     driver.close()
     t = Timer(random.randint(800,1200),loop)

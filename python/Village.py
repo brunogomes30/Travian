@@ -1,4 +1,5 @@
 from resources_utils import *
+from buildings_utils import *
 import functions
 
 class Village:
@@ -33,7 +34,7 @@ class Village:
     
     def refresh_data(self):
         get_resources(self,self.driver)
-        #get_buildings(self)
+        get_buildings(self)
     
     
     def __repr__(self):
@@ -42,4 +43,3 @@ class Village:
         string += "\n\tCereal Storage(%d)" %self.cereal_storage
         string += "\n\n\tProduction:\n\t\tWood(%d)\n\t\tClay(%d)\n\t\tIron(%d)\n\t\tCereal(%d)" %(self.wood_prod, self.clay_prod, self.iron_prod, self.cereal_prod)
         return string
-        

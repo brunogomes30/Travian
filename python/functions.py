@@ -1,6 +1,8 @@
 from selenium import webdriver
 server = "https://ts2.lusobrasileiro.travian.com/"
 from Village import *
+from Building import *
+from buildings_utils import *
 
 resources_tupple = ("madeira","barro","ferro","cereais")
 
