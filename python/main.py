@@ -39,7 +39,7 @@ def init():
 
 def loop():
     global driver,village
-    driver = webdriver.Chrome("webdriver\\chromedriver.exe") #,chrome_options=chrome_options 
+    driver = webdriver.Chrome("webdriver\\chromedriver.exe",chrome_options = chrome_options) #,chrome_options=chrome_options 
     driver.get("https://ts2.lusobrasileiro.travian.com/")
     driver.find_element_by_name("name").send_keys(username)
     driver.find_element_by_name("password").send_keys(password)
@@ -47,10 +47,23 @@ def loop():
     village.driver = driver
     village.refresh_data()
     print(village)
-    #functions.make_adventure(driver)
+    functions.make_adventure(driver)
     functions.level_best_resource(village)
+    driver.get("https://ts2.lusobrasileiro.travian.com/build.php?id=28")
+    functions.level_up_building(driver)
+    if(len(driver.find_elements_by_css_selector(".att2")) > 0):
+        try:
+            driver.get("https://ts2.lusobrasileiro.travian.com/build.php?id=39&tt=2&z=95301")
+            troops_a = driver.find_elements_by_css_selector("#troops > tbody >tr > td > a")
+            for a in troops_a:
+                a.click()
+            driver.find_element_by_id("btn_ok").click()
+            driver.find_element_by_id("btn_ok").click()
+        except Exception:
+            print("Can't attack")
+        
     driver.close()
-    t = Timer(random.randint(800,1200),loop)
+    t = Timer(random.randint(1200,1800),loop)
     t.start()
 loop()
 #print(driver.find_element_by_css_selector("#production > tbody > tr:first-child > .num").text[1:-1])

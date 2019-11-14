@@ -34,7 +34,7 @@ class Village:
     
     def refresh_data(self):
         get_resources(self,self.driver)
-        get_buildings(self)
+        #get_buildings(self)
     
     
     def __repr__(self):
