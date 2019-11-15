@@ -49,7 +49,7 @@ def loop():
     print(village)
     functions.make_adventure(driver)
     functions.level_best_resource(village)
-    driver.get("https://ts2.lusobrasileiro.travian.com/build.php?id=28")
+    driver.get("https://ts2.lusobrasileiro.travian.com/build.php?id=40")
     functions.level_up_building(driver)
     if(len(driver.find_elements_by_css_selector(".att2")) > 0):
         try:
